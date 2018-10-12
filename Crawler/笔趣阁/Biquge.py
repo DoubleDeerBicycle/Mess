@@ -68,10 +68,10 @@ def split_chapter(html):
 #下载章节保存到本地
 def download_text(yl_url):
     global bookName
-    file_dir = os.getcwd()+'/Crawler/file/小说'
+    file_dir = os.getcwd()+'/Crawler/file/小说/'
     if not os.path.exists(file_dir):
         os.makedirs(file_dir)
-    with open(file_dir+'/'+bookName+'.txt','a') as f:
+    with open(file_dir+bookName+'.txt','a') as f:
         print ('已下载到:'+yl_url.get('name'))
         f.write(yl_url.get('name')+'\n'+yl_url.get('text')+'\n')
 def main():
