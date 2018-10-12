@@ -72,8 +72,7 @@ def get_data(dict_list_url):
                     response.encoding = 'utf-8'
                     doc = pq(response.text)
                     td = doc('.alt').items()
-                    for i in td:
-                        print(i)
+                   
             except RequestException:
                 return None
 def main():
