@@ -15,7 +15,7 @@ headers = {
     'Upgrade-Insecure-Requests': '1',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3371.0 Safari/537.36'
 }
-proxy_pool_url = 'http://127.0.0.1:5000/get'
+proxy_pool_url = 'http://127.0.0.1:5555/get'
 proxy = None
 def get_proxy():
     try:
