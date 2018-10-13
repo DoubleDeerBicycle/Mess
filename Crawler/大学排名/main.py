@@ -8,6 +8,7 @@ from pyquery import PyQuery as pq
 import os
 index_url = 'http://www.zuihaodaxue.com/'
 #获得中国大学以及世界大学排名的栏目url
+file_dir = os.getcwd()+'/file/'
 def get_column_url(index_url):
     try:
         response = requests.get(index_url)
@@ -57,63 +58,43 @@ def get_data(dict_list_url):
                     response.encoding = 'utf-8'
                     doc = pq(response.text)
                     td_list = doc('.alt').items()
+                    #网页名
+                    title = doc('body > div.container > div > div.col-lg-9.col-md-9.col-sm-9.col-xs-12 > div > h3').text()
+                    global file_dir
+                    if not os.path.exists(file_dir):
+                        os.makedirs(file_dir)
+                    with open(file_dir+title+'.txt','a',encoding='utf8') as f:
+                        f.write(doc('body > div.container > div > div.col-lg-9.col-md-9.col-sm-9.col-xs-12 > div > div.news-blk > div > table > thead > tr > th:nth-child(1)').text()+'\t')
+                        f.write(doc('body > div.container > div > div.col-lg-9.col-md-9.col-sm-9.col-xs-12 > div > div.news-blk > div > table > thead > tr > th:nth-child(2)').text()+'\t')
+                        f.write(doc('body > div.container > div > div.col-lg-9.col-md-9.col-sm-9.col-xs-12 > div > div.news-blk > div > table > thead > tr > th.hidden-xs').text()+'\t')
+                        f.write(doc('body > div.container > div > div.col-lg-9.col-md-9.col-sm-9.col-xs-12 > div > div.news-blk > div > table > thead > tr > th:nth-child(4)').text()+'\t')
+                        f.write(doc('body > div.container > div > div.col-lg-9.col-md-9.col-sm-9.col-xs-12 > div > div.news-blk > div > table > thead > tr > th:nth-child(5)').text()+'\n') 
                     for td in td_list:
                         yield {
+                            'title':title,
                             't1':td.find('td:nth-child(1)').text(),
                             't2':td.find('td:nth-child(2) > div').text(),
                             't3':td.find('td:nth-child(3)').text(),                     
                             't4':td.find('td:nth-child(4)').text(),
                             't5':td.find('td:nth-child(5)').text()  
-                        }       
-            except RequestException:
-                return None
-#获取表格头信息以及网页名并写入                
-def get_title(dict_list_url):
-    cn_urls = dict_list_url.get('cn_urls')
-    #如果目录不存在则创建
-    file_dir = os.getcwd()+'/file/'
-    if not os.path.exists(file_dir):
-        os.makedirs(file_dir)
-    if cn_urls:
-        for url in cn_urls:
-            try:
-                response = requests.get(url)
-                if response.status_code == 200:
-                    response.encoding = 'utf-8'
-                    doc = pq(response.text)
-                    #网页名
-                    title = doc('body > div.container > div > div.col-lg-9.col-md-9.col-sm-9.col-xs-12 > div > h3').text()
-                    #表格头部信息
-                    print(title)
-                    f_write = open(file_dir+title+'.txt','a',encoding='utf8')
-                    f_write.write(doc('body > div.container > div > div.col-lg-9.col-md-9.col-sm-9.col-xs-12 > div > div.news-blk > div > table > thead > tr > th:nth-child(1)').text()+'\t')
-                    f_write.write(doc('body > div.container > div > div.col-lg-9.col-md-9.col-sm-9.col-xs-12 > div > div.news-blk > div > table > thead > tr > th:nth-child(2)').text()+'\t')
-                    f_write.write(doc('body > div.container > div > div.col-lg-9.col-md-9.col-sm-9.col-xs-12 > div > div.news-blk > div > table > thead > tr > th.hidden-xs').text()+'\t')
-                    f_write.write(doc('body > div.container > div > div.col-lg-9.col-md-9.col-sm-9.col-xs-12 > div > div.news-blk > div > table > thead > tr > th:nth-child(4)').text()+'\t')
-                    f_write.write(doc('body > div.container > div > div.col-lg-9.col-md-9.col-sm-9.col-xs-12 > div > div.news-blk > div > table > thead > tr > th:nth-child(5)').text()+'\n')                    
-                    datas = get_data(dict_list_url)
-                    for data in datas:
-                        download(data,f_write)
-                        print('-'*50)
+                        }
             except RequestException:
                 return None
 #写入数据到本地
-def download(data,f_write):
-    # f_write.write(data.get('t1')+'\t\t')
-    # f_write.write(data.get('t2')+'\t')
-    # f_write.write(data.get('t3')+'\t')
-    # f_write.write(data.get('t4')+'\t\t\t')
-    # f_write.write(data.get('t5')+'\n')
-    print(data.get('t1'))
-    print(data.get('t2'))
-    print(data.get('t3'))
-    print(data.get('t4'))
-    print(data.get('t5'))
+def download(data):
+    global file_dir
+    with open(file_dir+data.get('title')+'.txt','a',encoding='utf8') as f:
+        f.write(data.get('t1')+'\t\t')
+        f.write(data.get('t2')+'\t')
+        f.write(data.get('t3')+'\t')
+        f.write(data.get('t4')+'\t\t\t')
+        f.write(data.get('t5')+'\n')
 def main():
     global index_url
     #获取所有url
     dict_list_url = get_all_url(get_column_url(index_url))
     #创建文件以及写入表格头
-    get_title(dict_list_url)
+    for data in get_data(dict_list_url):
+        download(data)
     
 main()
