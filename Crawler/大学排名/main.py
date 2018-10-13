@@ -97,4 +97,5 @@ def main():
     for data in get_data(dict_list_url):
         download(data)
     
-main()
+if __name__ == '__main__':
+    main()
