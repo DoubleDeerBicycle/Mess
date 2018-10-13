@@ -25,8 +25,11 @@ def start_browser():
         sublit.click()
 
         #切换到搜索后跳转的页面
+        window = browser.current_window_handle
         windows = browser.window_handles
-        browser.switch_to_window(windows[-1])
+        for current_window in windows:
+            if current_window != window:
+                browser.switch_to_window(current_window)
         #返回搜索结果进行页面判断
         html = browser.page_source
         return html
