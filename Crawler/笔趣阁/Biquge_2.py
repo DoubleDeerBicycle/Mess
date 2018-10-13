@@ -128,7 +128,7 @@ def download_text(name,text):
     file_dir = os.getcwd()+'/file/小说/'
     if not os.path.exists(file_dir):
         os.makedirs(file_dir)
-    with open(file_dir+BOOKNAME+'.txt','a') as f:
+    with open(file_dir+BOOKNAME+'.txt','a',encoding='utf-8') as f:
         print ('下载到:'+name)
         f.write(name+'\n'+text+'\n')
 def main():
