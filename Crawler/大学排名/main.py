@@ -64,10 +64,10 @@ def get_data(dict_list_url):
                     if not os.path.exists(file_dir):
                         os.makedirs(file_dir)
                     with open(file_dir+title+'.txt','a',encoding='utf8') as f:
-                        f.write(doc('body > div.container > div > div.col-lg-9.col-md-9.col-sm-9.col-xs-12 > div > div.news-blk > div > table > thead > tr > th:nth-child(1)').text()+'\t')
-                        f.write(doc('body > div.container > div > div.col-lg-9.col-md-9.col-sm-9.col-xs-12 > div > div.news-blk > div > table > thead > tr > th:nth-child(2)').text()+'\t')
-                        f.write(doc('body > div.container > div > div.col-lg-9.col-md-9.col-sm-9.col-xs-12 > div > div.news-blk > div > table > thead > tr > th.hidden-xs').text()+'\t')
-                        f.write(doc('body > div.container > div > div.col-lg-9.col-md-9.col-sm-9.col-xs-12 > div > div.news-blk > div > table > thead > tr > th:nth-child(4)').text()+'\t')
+                        f.write(doc('body > div.container > div > div.col-lg-9.col-md-9.col-sm-9.col-xs-12 > div > div.news-blk > div > table > thead > tr > th:nth-child(1)').text().ljust(20))
+                        f.write(doc('body > div.container > div > div.col-lg-9.col-md-9.col-sm-9.col-xs-12 > div > div.news-blk > div > table > thead > tr > th:nth-child(2)').text().ljust(20))
+                        f.write(doc('body > div.container > div > div.col-lg-9.col-md-9.col-sm-9.col-xs-12 > div > div.news-blk > div > table > thead > tr > th.hidden-xs').text().ljust(20))
+                        f.write(doc('body > div.container > div > div.col-lg-9.col-md-9.col-sm-9.col-xs-12 > div > div.news-blk > div > table > thead > tr > th:nth-child(4)').text().ljust(20))
                         f.write(doc('body > div.container > div > div.col-lg-9.col-md-9.col-sm-9.col-xs-12 > div > div.news-blk > div > table > thead > tr > th:nth-child(5)').text()+'\n') 
                     for td in td_list:
                         yield {
@@ -84,10 +84,10 @@ def get_data(dict_list_url):
 def download(data):
     global file_dir
     with open(file_dir+data.get('title')+'.txt','a',encoding='utf8') as f:
-        f.write(data.get('t1')+'\t\t')
-        f.write(data.get('t2')+'\t')
-        f.write(data.get('t3')+'\t')
-        f.write(data.get('t4')+'\t\t\t')
+        f.write(data.get('t1').ljust(20))
+        f.write(data.get('t2').ljust(20))
+        f.write(data.get('t3').ljust(20))
+        f.write(data.get('t4').ljust(30))
         f.write(data.get('t5')+'\n')
 def main():
     global index_url
