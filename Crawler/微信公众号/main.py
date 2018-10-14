@@ -98,13 +98,13 @@ def parse_detail(html):
     }
     
 def save_to_mongo(data):
-    if db['articles'].update({'title':data['title']},{'$set':data},True):
+    if db['exercise'].update({'title':data['title']},{'$set':data},True):
         print('Saved to Mongo',data['title'])
     else:
         print('Saved to Mongo Failed',data['title'])
 def main():
     for page in range(1, 101):
-        html = get_index('风景', page)
+        html = get_index('锻炼', page)
         if html:
             article_urls = pares_index(html)
             for article_url in article_urls:
