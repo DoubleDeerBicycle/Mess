@@ -5,3 +5,4 @@ CookiesPool-master/*
 .gitignore
 file/*
 ghostdriver.log
+python\Game\game\__pycache__/*
