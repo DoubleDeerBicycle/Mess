@@ -1,5 +1,6 @@
 '''
 目标网址：http://amlyu.com/
+注：如果控制台许久不更新，可能是服务器压力太大导致未响应，当出现这种情况请停止爬取
 '''
 import requests
 import os
