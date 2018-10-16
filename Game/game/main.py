@@ -522,7 +522,7 @@ def main():
             if not recorded:
                 recorded = True
                 #读取历史最高得分record_score 
-                with open('Game/game/re.txt','r') as f:
+                with open('Game/game/Recording.txt','r') as f:
                     record_score = f.read()
                     if record_score != '':
                         record_score = int(record_score) 
