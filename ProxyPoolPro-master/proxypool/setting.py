@@ -7,7 +7,7 @@ REDIS_PORT = 6379
 # Redis密码，如无填None
 REDIS_PASSWORD = None
 
-REDIS_KEY = 'proxies_2'
+REDIS_KEY = 'proxies'
 
 # 代理分数
 MAX_SCORE = 3
