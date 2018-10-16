@@ -20,20 +20,20 @@ class Amlyu:
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3371.0 Safari/537.36'
         }
         #使用phantomjs爬取 禁止加载图片，提高爬取效率
-        self.__dcap = dict(DesiredCapabilities.PHANTOMJS)
+        # self.__dcap = dict(DesiredCapabilities.PHANTOMJS)
         #禁止加载图片
-        self.__dcap["phantomjs.page.settings.loadImages"] = False 
-        self.__browser = webdriver.PhantomJS(executable_path=r'D:\Program Files (x86)\phantomjs-2.1.1-windows\bin\phantomjs.exe' ,desired_capabilities=self.__dcap)
+        # self.__dcap["phantomjs.page.settings.loadImages"] = False 
+        # self.__browser = webdriver.PhantomJS(executable_path=r'D:\Program Files (x86)\phantomjs-2.1.1-windows\bin\phantomjs.exe' ,desired_capabilities=self.__dcap)
         
         #使用chrome爬取 禁止加载图片，提高爬取效率
-        # self.__options = webdriver.ChromeOptions()
-        # self.__prefs = {
-        #     'profile.default_content_setting_values' : {
-        #         'images' : 2
-        #     }
-        # }
-        # self.__options.add_experimental_option('prefs',self.__prefs)        
-        # self.__browser = webdriver.Chrome(chrome_options=self.__options)
+        self.__options = webdriver.ChromeOptions()
+        self.__prefs = {
+            'profile.default_content_setting_values' : {
+                'images' : 2
+            }
+        }
+        self.__options.add_experimental_option('prefs',self.__prefs)        
+        self.__browser = webdriver.Chrome(chrome_options=self.__options)
         self.__wait = WebDriverWait(self.__browser,10)
     #请求首页，获取分类url
     def run(self):
@@ -62,40 +62,48 @@ class Amlyu:
                 if response.status_code == 200:
                     self.__browser.get(url)
                     doc = pq(response.text)
+                    #图片集url
                     images_url = []
-                    self.__analytical_iamges(doc,images_url)
+                    #图片集名称列表
+                    iamge_name_list = []
+                    self.__analytical_iamges(doc,images_url,iamge_name_list)
                     while doc.find('.container .pagination > ul .next-page > a'):
                         next_page = self.__wait.until(EC.presence_of_element_located((By.CSS_SELECTOR,'.container .pagination > ul .next-page > a')))
                         next_page.click()
                         html = self.__browser.find_element_by_xpath("//*").get_attribute("outerHTML")
                         doc = pq(html)
-                        self.__analytical_iamges(doc,images_url)                       
-                    self.__get_image_url(images_url)
+                        self.__analytical_iamges(doc,images_url,iamge_name_list)                       
+                    self.__get_image_url(images_url,iamge_name_list)
         except RequestException as e:
             print(e)
         except TimeoutException as e:
             print(e)
     
-    #解析图片集中图片url的方法抽取
-    def __analytical_iamges(self,doc,images_url):
+    #解析图片集url的方法抽取
+    def __analytical_iamges(self,doc,images_url,iamge_name_list):
         images = doc('.excerpts .excerpt > a').items()
+        images_name = doc('.excerpts .excerpt > h2').items()
         for url in images:
             images_url.append(url.attr('href'))
-
+        for name in images_name:
+            iamge_name_list.append(name.text())
     #获取图片集中的图片url
-    def __get_image_url(self,images_url):
+    def __get_image_url(self,images_url,iamge_name_list):
         try:
-            for url in images_url:
-                response = requests.get(url,headers=self.__headers)
-                if response.status_code == 200:
-                    doc = pq(response.text)
-                    images = doc('body > section > article > p img').items()
-                    #图片集名称
-                    self.__images_name = doc('body > div.focusbox > div > h1').text()
-                    self.__image = []
-                    for image in images:
-                        self.__image.append(image.attr('src'))
-                    self.__download_image()
+            for name in iamge_name_list:
+                file_dir = os.getcwd()+'/file/图片/'+name
+                if not os.path.exists(file_dir):
+                    for url in images_url:
+                        response = requests.get(url,headers=self.__headers)
+                        if response.status_code == 200:
+                            doc = pq(response.text)
+                            images = doc('body > section > article > p img').items()
+                            #图片集名称
+                            self.__images_name = doc('body > div.focusbox > div > h1').text()
+                            self.__image = []
+                            for image in images:
+                                self.__image.append(image.attr('src'))
+                            self.__download_image()
         except RequestException as e:
             print(e)
     #下载图片
@@ -110,7 +118,6 @@ class Amlyu:
                 content = requests.get(url).content
                 with open(file_dir+'/'+md5(content).hexdigest()+'.jpg','wb') as f:
                     f.write(content)
-        
 #启动程序
 amlyu = Amlyu()
 amlyu.run()
