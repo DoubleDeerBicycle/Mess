@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from mzituProject.items import MzituprojectItem
-
+from time import sleep
 class MzituSpider(scrapy.Spider):
     name = 'mzitu'
-    allowed_domains = ['www.mzitu.com/tag/xiuren/']
+    allowed_domains = ['www.mzitu.com']
     start_urls = ['http://www.mzitu.com/tag/xiuren//']
 
     def parse(self, response):
@@ -22,7 +22,7 @@ class MzituSpider(scrapy.Spider):
             item['number'] = number
             yield item
         
-        next = response.css('.navigation .nav-links .next::attr(href)').extract_first()
-        url = response.urjoin(next)
+        next = response.css('.next::attr(href)').extract_first()
+        url = response.urljoin(next)
         yield scrapy.Request(url=url, callback=self.parse)
 
