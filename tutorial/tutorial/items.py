@@ -11,6 +11,15 @@ import scrapy
 class TutorialItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
+    pass
+class JobboleItem(scrapy.Item):
     title = scrapy.Field()
-    link = scrapy.Field()
-    desc = scrapy.Field()
+    date = scrapy.Field()
+    praise_nums = scrapy.Field()
+    collection_nums = scrapy.Field()
+    comments_nums = scrapy.Field()
+    content = scrapy.Field()
+    post_image_url = scrapy.Field()
+    post_image_path = scrapy.Field()
+    url = scrapy.Field()
+    url_object_id = scrapy.Field()

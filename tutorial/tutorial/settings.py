@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import  os
 # Scrapy settings for tutorial project
 #
 # For simplicity, this file contains only settings considered important or
@@ -19,7 +19,7 @@ NEWSPIDER_MODULE = 'tutorial.spiders'
 #USER_AGENT = 'tutorial (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -64,10 +64,27 @@ ROBOTSTXT_OBEY = True
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'tutorial.pipelines.TutorialPipeline': 300,
-#}
+ITEM_PIPELINES = {
+   'tutorial.pipelines.TutorialPipeline': 300,
+   # 'scrapy.pipelines.images.ImagesPipeline':300, #配置下载图片
+   # 'tutorial.pipelines.JobbolePipeline':200,
+   'tutorial.pipelines.MysqlTwistedPipeline':400
+}
 
+#图片url
+IMAGES_URLS_FIELD = "post_image_url"
+#配置图片下载路径
+images_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'images')
+IMAGES_STORE = images_dir
+#设置过滤器，分辨率低于100*100的将被过滤
+IMAGES_MIN_HEIGHT = 100
+IMAGES_MIN_WIDTH = 100
+
+MYSQL_LOCALHOST = 'localhost'
+MYSQL_DB = 'scrapy'
+MYSQL_USER = 'root'
+MYSQL_PASSWD = '1996'
+MYSQL_PORT = 3306
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
 #AUTOTHROTTLE_ENABLED = True

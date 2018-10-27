@@ -73,7 +73,7 @@ def get_chapter(url):
         file_dir = os.getcwd() + '/file/小说/'
         if not os.path.exists(file_dir):
             os.makedirs(file_dir)
-        f_write = open(file_dir + bookname.group(1) + '.txt', 'a')
+        f_write = open(file_dir + bookname.group(1) + '.txt', 'a', encoding='utf-8')
         start_a = re.search('box-item.*?rel.*?href="(.*?)">.*?</a>', html, re.S)
         browser.get(url + start_a.group(1))
         next_page = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '#nextLink')))
