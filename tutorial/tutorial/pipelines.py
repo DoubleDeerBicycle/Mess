@@ -87,8 +87,14 @@ class MysqlTwistedPipeline(object):
         print(failure)
 
     def do_insert(self, cursor, item):
+        # insert_sql = '''
+        #     insert into jobbole(title, url, date, praise_nums, collection_nums, comments_nums, content, post_image_url, post_image_path ,url_object_id)
+        #     values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        # '''
+        # cursor.execute(insert_sql, (item['title'], item['url'], item['date'], item['praise_nums'], item['collection_nums'], item['comments_nums'], item['content'], item['post_image_url'], item['post_image_path'], item['url_object_id'],))
+
         insert_sql = '''
-            insert into jobbole(title, url, date, praise_nums, collection_nums, comments_nums, content, post_image_url, post_image_path ,url_object_id)
-            values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        '''
-        cursor.execute(insert_sql, (item['title'], item['url'], item['date'], item['praise_nums'], item['collection_nums'], item['comments_nums'], item['content'], item['post_image_url'], item['post_image_path'], item['url_object_id'],))
+                           insert into moviett(url,movie_name)
+                           values (%s, %s)
+                       '''
+        cursor.execute(insert_sql, (item['url'], item['movie_name']))

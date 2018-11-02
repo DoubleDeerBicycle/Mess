@@ -5,6 +5,7 @@ from urllib import parse
 from tutorial.items import JobboleItem
 from tutorial.utils.common import get_md5
 import datetime
+from scrapy.loader import ItemLoader
 class JobboleSpider(scrapy.Spider):
     name = 'jobbole'
     allowed_domains = ['blog.jobbole.com']
@@ -25,7 +26,7 @@ class JobboleSpider(scrapy.Spider):
             yield Request(url=parse.urljoin(response.url,next_url),callback=self.parse)
 
     def parse_detail(self, response):
-        item = JobboleItem()
+        # item = JobboleItem()
         #通过xpath提取数据
         # title = response.xpath('//div[@class="entry-header"]/h1/text()')
         # date = response.xpath('//p[@class="entry-meta-hide-on-mobile"]').re('.*?(\d{4}/\d{1,2}/\d{1,2})')[0]
@@ -35,39 +36,55 @@ class JobboleSpider(scrapy.Spider):
         # content = response.xpath('//div[@class="entry"]').extract()
         
         #通过css提取数据
-        post_image_url = response.meta.get('post_image_url')
-        title = response.css('div.entry-header > h1::text').extract_first()
-        date = response.css('p.entry-meta-hide-on-mobile::text').re('.*?(\d{4}/\d{1,2}/\d{1,2})')[0]
-        praise_nums = response.css('div.post-adds .btn-bluet-bigger > h10 ::text').extract_first()
-        collection_nums = response.css('div.post-adds span:nth-child(2)::text').re('.*?(\d+)')
-        comments_nums = response.css('div.post-adds >a > span::text').re('.*?(\d+)')
-        content = response.css('div.entry').extract_first()
+        # post_image_url = response.meta.get('post_image_url')
+        # title = response.css('div.entry-header > h1::text').extract_first()
+        # date = response.css('p.entry-meta-hide-on-mobile::text').re('.*?(\d{4}/\d{1,2}/\d{1,2})')[0]
+        # praise_nums = response.css('div.post-adds .btn-bluet-bigger > h10 ::text').extract_first()
+        # collection_nums = response.css('div.post-adds span:nth-child(2)::text').re('.*?(\d+)')
+        # comments_nums = response.css('div.post-adds >a > span::text').re('.*?(\d+)')
+        # content = response.css('div.entry').extract_first()
 
-        if not praise_nums:
-            praise_nums = 0
-        else:
-            praise_nums = int(praise_nums)
-        if not comments_nums:
-            comments_nums = 0
-        else:
-            comments_nums = int(comments_nums[0])
-        if not collection_nums:
-            collection_nums = 0
-        else:
-            collection_nums = int(collection_nums[0])
-            
-        try:
-            date = datetime.datetime.strptime(date,'%Y/%m/%d').date()
-        except Exception as e:
-            date = datetime.datetime.now()
-        item['url_object_id'] = get_md5(response.url)
-        item['title'] = title
-        item['url'] = response.url
-        item['date'] = date
-        item['content'] = content
-        item['praise_nums'] = praise_nums
-        item['collection_nums'] = collection_nums
-        item['comments_nums'] = comments_nums
-        item['post_image_url'] = [post_image_url]
-        item['post_image_path'] = None
+        # if not praise_nums:
+        #     praise_nums = 0
+        # else:
+        #     praise_nums = int(praise_nums)
+        # if not comments_nums:
+        #     comments_nums = 0
+        # else:
+        #     comments_nums = int(comments_nums[0])
+        # if not collection_nums:
+        #     collection_nums = 0
+        # else:
+        #     collection_nums = int(collection_nums[0])
+        #
+        # try:
+        #     date = datetime.datetime.strptime(date,'%Y/%m/%d').date()
+        # except Exception as e:
+        #     date = datetime.datetime.now()
+        # item['url_object_id'] = get_md5(response.url)
+        # item['title'] = title
+        # item['url'] = response.url
+        # item['date'] = date
+        # item['content'] = content
+        # item['praise_nums'] = praise_nums
+        # item['collection_nums'] = collection_nums
+        # item['comments_nums'] = comments_nums
+        # item['post_image_url'] = [post_image_url]
+        # item['post_image_path'] = None
+
+        #通过itemloader加载item
+        post_image_url = response.meta.get('post_image_url')
+        itme_loader = ItemLoader(item=JobboleItem(), response=response)
+        itme_loader.add_css('title', 'div.entry-header > h1::text')
+        itme_loader.add_value('url_object_id', get_md5(response.url))
+        itme_loader.add_value('url', response.url)
+        itme_loader.add_css('date', 'p.entry-meta-hide-on-mobile::text')
+        itme_loader.add_css('content', 'div.entry')
+        itme_loader.add_css('praise_nums', 'div.post-adds .btn-bluet-bigger > h10 ::text')
+        itme_loader.add_css('collection_nums', 'div.post-adds span:nth-child(2)::text')
+        itme_loader.add_css('comments_nums', 'div.post-adds >a > span::text')
+        itme_loader.add_value('post_image_url', [post_image_url])
+        itme_loader.add_value('post_image_path', None)
+        item = itme_loader.load_item()
+
         yield item
