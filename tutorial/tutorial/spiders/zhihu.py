@@ -6,6 +6,8 @@ from hashlib import sha1
 import re
 import scrapy
 import json
+from scrapy.loader import ItemLoader
+from tutorial.items import ZhihuQuestionItem,ZhihuAnswerItem
 class ZhihuSpider(scrapy.Spider):
     name = 'zhihu'
     allowed_domains = ['www.zhihu.com']
@@ -25,22 +27,48 @@ class ZhihuSpider(scrapy.Spider):
     timestamp2 = str(time.time() * 1000)
     captcha_url = 'https://www.zhihu.com/api/v3/oauth/captcha?lang=en'
 
-
     def parse(self, response):
-        print(response.text)
+        all_urls = response.css('a::attr(href)').extract()
+        all_urls = [response.urljoin(url) for url in all_urls]
+        all_urls = filter(lambda x: True if x.startswith('https') else False, all_urls)
+        for url in all_urls:
+            search_obj = re.search('(.*?question/(\d+))/.*?', url)
+            if search_obj:
+               request_url = search_obj.group(1)
+               question_id = search_obj.group(2)
+               yield scrapy.Request(request_url, headers=self.headers, meta={'question_id':question_id}, callback=self.parse_question)
 
+    def parse_question(self, response):
+        question_id = int(response.meta.get('question_id'))
+        content = re.search('.*?editableDetail":"(.*?)",',response.text, re.S).group(1)
+        answer_num = int(re.search('.*?answerCount":(\d*),',response.text,re.S).group(1))
+        comments_num = int(re.search('.*?commentCount":(\d*),', response.text, re.S).group(1))
+        follower_user_num = int(re.search('.*?followerCount":(\d*),', response.text, re.S).group(1))
+        visit_num = int(re.search('.*?visitCount":(\d*),', response.text, re.S).group(1))
+        topics = response.css('#null-toggle::text').extract()
+        if '默认排序' in topics:
+            topics.remove('默认排序')
+        topics = ','.join(topics)
 
+        item_loader = ItemLoader(item=ZhihuQuestionItem(), response=response)
+        item_loader.add_css('title', 'h1.QuestionHeader-title::text')
+        item_loader.add_value('url', response.url)
+        item_loader.add_value('content', content)
+        item_loader.add_value('zhihu_id', question_id)
+        item_loader.add_value('answer_num', answer_num)
+        item_loader.add_value('comments_num', comments_num)
+        item_loader.add_value('follower_user_num', follower_user_num)
+        item_loader.add_value('visit_num', visit_num)
+        item_loader.add_value('topics', topics)
 
     def start_requests(self):
-        return [scrapy.Request(self.captcha_url, headers=self.headers,
-        callback=self.login)]
+        return [scrapy.Request(self.captcha_url, headers=self.headers, callback=self.login)]
 
     def login(self, response):
         need_cap = json.loads(response.body)['show_captcha']
         if need_cap:
             print("需要验证码")
-            yield scrapy.Request(url=self.captcha_url, headers=self.headers,
-            callback=self.captcha, method='PUT')
+            yield scrapy.Request(url=self.captcha_url, headers=self.headers,  callback=self.captcha, method='PUT')
         else:
             print("不需要验证码")
             post_url = 'https://www.zhihu.com/api/v3/oauth/sign_in'
@@ -57,7 +85,6 @@ class ZhihuSpider(scrapy.Spider):
             }
             yield scrapy.FormRequest(url=post_url, formdata=post_data, headers=self.headers, callback=self.check_login)
 
-
     def get_signature(self, grant_type, client_id, source, timestamp):
         """处理签名"""
         hm = hmac.new(b'd1b964811afb40118a12068ff74a12f4', None, sha1)
@@ -66,7 +93,6 @@ class ZhihuSpider(scrapy.Spider):
         hm.update(str.encode(source))
         hm.update(str.encode(timestamp))
         return str(hm.hexdigest())
-
 
     def captcha(self, response):
         try:
@@ -107,12 +133,12 @@ class ZhihuSpider(scrapy.Spider):
         }
         headers = self.headers
         headers.update({
-        'Origin': 'https://www.zhihu.com',
-        'Pragma': 'no-cache',
-        'Cache-Control': 'no-cache',
-        'x-xsrftoken': 'UiFIIz9fMjuytEYZ7VViRIBKZugpWsEK',
-        'X-Zse-83': '3_1.1',
-        'x-requested-with': 'fetch',
+            'Origin': 'https://www.zhihu.com',
+            'Pragma': 'no-cache',
+            'Cache-Control': 'no-cache',
+            'x-xsrftoken': 'UiFIIz9fMjuytEYZ7VViRIBKZugpWsEK',
+            'X-Zse-83': '3_1.1',
+            'x-requested-with': 'fetch',
         })
         yield scrapy.FormRequest(url=post_url, formdata=post_data, headers=headers, callback=self.check_login)
 
