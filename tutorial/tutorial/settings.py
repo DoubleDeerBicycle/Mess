@@ -84,6 +84,8 @@ MYSQL_DB = 'scrapy'
 MYSQL_USER = 'root'
 MYSQL_PASSWD = '1996'
 MYSQL_PORT = 3306
+SQL_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+SQL_DATE_FORMAT = '%Y-%m-%d'
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
 #AUTOTHROTTLE_ENABLED = True

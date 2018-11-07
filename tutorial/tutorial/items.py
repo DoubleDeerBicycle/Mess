@@ -92,6 +92,15 @@ class JobboleItem(scrapy.Item):
         output_processor = TakeFirst()
     )
 
+    def get_insert_sql(self):
+        insert_sql = '''
+                   insert into jobbole(title, url, date, praise_nums, collection_nums, comments_nums, content, post_image_url, post_image_path ,url_object_id)
+                   values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+               '''
+        params = (self['title'], self['url'], self['date'], self['praise_nums'], self['collection_nums'], self['comments_nums'],
+                               self['content'], self['post_image_url'], self['post_image_path'], self['url_object_id'],)
+        return insert_sql, params
+
 
 class MoviettItem(scrapy.Item):
     url = scrapy.Field(
@@ -102,47 +111,129 @@ class MoviettItem(scrapy.Item):
         output_processor = TakeFirst()
     )
 
+    def get_insert_sql(self):
+        insert_sql = '''
+                                   insert into moviett(url,movie_name)
+                                   values (%s, %s)
+                               '''
+        params = (self['url'], self['movie_name'])
+        return insert_sql, params
 
-#知乎问题item
+
+#   知乎问题item
 class ZhihuQuestionItem(scrapy.Item):
-    zhihu_id = scrapy.Field()
+    zhihu_id = scrapy.Field(
+        output_processor=TakeFirst()
+    )
 
-    topics = scrapy.Field()
+    topics = scrapy.Field(
+        output_processor=TakeFirst()
+    )
 
-    url = scrapy.Field()
+    url = scrapy.Field(
+        output_processor=TakeFirst()
+    )
 
-    title = scrapy.Field()
+    title = scrapy.Field(
+        output_processor=TakeFirst()
+    )
 
-    content = scrapy.Field()
+    content = scrapy.Field(
+        output_processor=TakeFirst()
+    )
 
-    answer_num = scrapy.Field()
+    answer_num = scrapy.Field(
+        output_processor=TakeFirst()
+    )
 
-    comments_num = scrapy.Field()
+    comments_num = scrapy.Field(
+        output_processor=TakeFirst()
+    )
 
-    follower_user_num = scrapy.Field()
+    follower_user_num = scrapy.Field(
+        output_processor=TakeFirst()
+    )
 
-    visit_num = scrapy.Field()
+    visit_num = scrapy.Field(
+        output_processor=TakeFirst()
+    )
 
-    crawl_time = scrapy.Field()
+    crawl_time = scrapy.Field(
+        output_processor=TakeFirst()
+    )
 
-#知乎的回答item
+    def get_insert_sql(self):
+        #   插入知乎question的sql语句
+        insert_sql = '''
+            insert into zhihu_question(zhihu_id,topics,url,title,content,answer_num,comments_num,follower_user_num,
+            visit_num,crawl_time) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        '''
+        params = (self['zhihu_id'], self['topics'],self['url'], self['title'],self['content'], self['answer_num'],
+                  self['comments_num'], self['follower_user_num'],self['visit_num'], self['crawl_time'])
+
+        return insert_sql, params
+
+
+#   知乎的回答item
 class ZhihuAnswerItem(scrapy.Item):
-    zhihu_id = scrapy.Field()
+    zhihu_id = scrapy.Field(
+        output_processor=TakeFirst()
+    )
 
-    url = scrapy.Field()
+    title = scrapy.Field(
+        output_processor=TakeFirst()
+    )
 
-    question_id = scrapy.Field()
+    headline = scrapy.Field(
+        output_processor=TakeFirst()
+    )
 
-    author_id = scrapy.Field()
+    user_name = scrapy.Field(
+        output_processor=TakeFirst()
+    )
+    url = scrapy.Field(
+        output_processor=TakeFirst()
+    )
 
-    content = scrapy.Field()
+    question_id = scrapy.Field(
+        output_processor=TakeFirst()
+    )
 
-    parise_num = scrapy.Field()
+    author_id = scrapy.Field(
+        output_processor=TakeFirst()
+    )
 
-    comments_num = scrapy.Field()
+    content = scrapy.Field(
+        output_processor=TakeFirst()
+    )
 
-    create_time = scrapy.Field()
+    praise_num = scrapy.Field(
+        output_processor=TakeFirst()
+    )
 
-    update_time = scrapy.Field()
+    comments_num = scrapy.Field(
+        output_processor=TakeFirst()
+    )
 
-    crawl_time = scrapy.Field()
+    create_time = scrapy.Field(
+        output_processor=TakeFirst()
+    )
+
+    update_time = scrapy.Field(
+        output_processor=TakeFirst()
+    )
+
+    crawl_time = scrapy.Field(
+        output_processor=TakeFirst()
+    )
+
+    def get_insert_sql(self):
+        #   插入知乎AnswerItem的sql语句
+        insert_sql = '''
+            insert into zhihu_answer(zhihu_id,url,question_id,author_id,content,praise_num,comments_num,create_time,
+            update_time,crawl_time,title,headline,user_name) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        '''
+        params = (self['zhihu_id'], self['url'],self['question_id'], self['author_id'],self['content'], self['praise_num'],
+                  self['comments_num'], self['create_time'],self['update_time'], self['crawl_time'], self['title'],self['headline'], self['user_name'])
+
+        return insert_sql, params

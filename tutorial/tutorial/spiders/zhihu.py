@@ -6,16 +6,20 @@ from hashlib import sha1
 import re
 import scrapy
 import json
+import datetime
 from scrapy.loader import ItemLoader
 from tutorial.items import ZhihuQuestionItem,ZhihuAnswerItem
+from tutorial.settings import SQL_DATETIME_FORMAT,SQL_DATE_FORMAT
 class ZhihuSpider(scrapy.Spider):
     name = 'zhihu'
     allowed_domains = ['www.zhihu.com']
     start_urls = ['http://www.zhihu.com/']
 
+    #answer请求
+    answer_url = 'https://www.zhihu.com/api/v4/questions/{id}/answers?include={include}&offset={offset}&limit={limit}&sort_by=default'
+    answer_query = 'data[*].is_normal,admin_closed_comment,reward_info,is_collapsed,annotation_action,annotation_detail,collapse_reason,is_sticky,collapsed_by,suggest_edit,comment_count,can_comment,content,editable_content,voteup_count,reshipment_settings,comment_permission,created_time,updated_time,review_info,relevant_info,question,excerpt,relationship.is_authorized,is_author,voting,is_thanked,is_nothelp;data[*].mark_infos[*].url;data[*].author.follower_count,badge[*].topics'
     headers = {
         'Connection': 'keep-alive',
-        # 'HOST': 'http://www.zhihu.com',
         'Referer': 'https://www.zhihu.com/signup?next=%2F',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36'
     }
@@ -36,10 +40,13 @@ class ZhihuSpider(scrapy.Spider):
             if search_obj:
                request_url = search_obj.group(1)
                question_id = search_obj.group(2)
-               yield scrapy.Request(request_url, headers=self.headers, meta={'question_id':question_id}, callback=self.parse_question)
+               yield scrapy.Request(response.urljoin(request_url), headers=self.headers, meta={'question_id':question_id},
+                                    callback=self.parse_question)
+            else:
+                yield scrapy.Request(url, headers=self.headers, callback=self.parse)
 
     def parse_question(self, response):
-        question_id = int(response.meta.get('question_id'))
+        question_id = response.meta.get('question_id')
         content = re.search('.*?editableDetail":"(.*?)",',response.text, re.S).group(1)
         answer_num = int(re.search('.*?answerCount":(\d*),',response.text,re.S).group(1))
         comments_num = int(re.search('.*?commentCount":(\d*),', response.text, re.S).group(1))
@@ -54,16 +61,47 @@ class ZhihuSpider(scrapy.Spider):
         item_loader.add_css('title', 'h1.QuestionHeader-title::text')
         item_loader.add_value('url', response.url)
         item_loader.add_value('content', content)
-        item_loader.add_value('zhihu_id', question_id)
+        item_loader.add_value('zhihu_id', int(question_id))
         item_loader.add_value('answer_num', answer_num)
         item_loader.add_value('comments_num', comments_num)
         item_loader.add_value('follower_user_num', follower_user_num)
         item_loader.add_value('visit_num', visit_num)
         item_loader.add_value('topics', topics)
+        item_loader.add_value('crawl_time', datetime.datetime.now().strftime(SQL_DATETIME_FORMAT))
+        question_item = item_loader.load_item()
+        yield scrapy.Request(self.answer_url.format(id=question_id, include=self.answer_query, offset=0, limit=20),
+                             headers=self.headers, callback=self.parse_answer)
+        yield question_item
+
+    def parse_answer(self, response):
+        ans_json = json.loads(response.text)
+        is_end = ans_json['paging']['is_end']
+        next_url = ans_json['paging']['next']
+
+        #   提取answer的具体字段
+        for answer in ans_json['data']:
+            answer_item = ZhihuAnswerItem()
+            answer_item['zhihu_id'] = answer['id']
+            answer_item['url'] = answer['url']
+            answer_item['question_id'] = answer['question']['id']
+            answer_item['title'] = answer['question']['title']
+            answer_item['headline'] = answer['author']['headline']
+            answer_item['user_name'] = answer['author']['name']
+            answer_item['author_id'] = answer['author']['id'] if 'id' in answer['author'] else None
+            answer_item['content'] = answer['content'] if 'content' in answer else None
+            answer_item['praise_num'] = answer['voteup_count']
+            answer_item['comments_num'] = answer['comment_count']
+            answer_item['create_time'] = datetime.datetime.fromtimestamp(answer['created_time']).strftime(SQL_DATETIME_FORMAT)
+            answer_item['update_time'] = datetime.datetime.fromtimestamp(answer['updated_time']).strftime(SQL_DATETIME_FORMAT)
+            answer_item['crawl_time'] = datetime.datetime.now().strftime(SQL_DATETIME_FORMAT)
+            yield answer_item
+
+        #   判断是否到达尾页
+        if not is_end:
+            yield scrapy.Request(next_url, headers=self.headers, callback=self.parse_answer)
 
     def start_requests(self):
         return [scrapy.Request(self.captcha_url, headers=self.headers, callback=self.login)]
-
     def login(self, response):
         need_cap = json.loads(response.body)['show_captcha']
         if need_cap:
