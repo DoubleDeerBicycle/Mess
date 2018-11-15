@@ -102,6 +102,7 @@ class ZhihuSpider(scrapy.Spider):
 
     def start_requests(self):
         return [scrapy.Request(self.captcha_url, headers=self.headers, callback=self.login)]
+
     def login(self, response):
         need_cap = json.loads(response.body)['show_captcha']
         if need_cap:

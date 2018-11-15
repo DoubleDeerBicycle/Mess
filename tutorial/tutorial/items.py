@@ -6,8 +6,12 @@
 # https://doc.scrapy.org/en/latest/topics/items.html
 
 import scrapy
-from scrapy.loader.processors import MapCompose, TakeFirst
+from scrapy.loader import ItemLoader
+from scrapy.loader.processors import MapCompose, TakeFirst, Join
 import datetime,re
+from w3lib.html import remove_tags
+
+
 class TutorialItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
@@ -167,6 +171,8 @@ class ZhihuQuestionItem(scrapy.Item):
         insert_sql = '''
             insert into zhihu_question(zhihu_id,topics,url,title,content,answer_num,comments_num,follower_user_num,
             visit_num,crawl_time) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            ON DUPLICATE KEY UPDATE content=VALUES(content),comments_num=VALUES(comments_num),
+            answer_num=VALUES(answer_num),follower_user_num=VALUES(follower_user_num) 
         '''
         params = (self['zhihu_id'], self['topics'],self['url'], self['title'],self['content'], self['answer_num'],
                   self['comments_num'], self['follower_user_num'],self['visit_num'], self['crawl_time'])
@@ -232,8 +238,63 @@ class ZhihuAnswerItem(scrapy.Item):
         insert_sql = '''
             insert into zhihu_answer(zhihu_id,url,question_id,author_id,content,praise_num,comments_num,create_time,
             update_time,crawl_time,title,headline,user_name) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            ON DUPLICATE KEY UPDATE content=VALUES(content),praise_num=
+            VALUES(praise_num),comments_num=VALUES(comments_num),update_time=VALUES(update_time)
         '''
         params = (self['zhihu_id'], self['url'],self['question_id'], self['author_id'],self['content'], self['praise_num'],
                   self['comments_num'], self['create_time'],self['update_time'], self['crawl_time'], self['title'],self['headline'], self['user_name'])
 
         return insert_sql, params
+
+
+    #拉钩
+
+def remove_splash(value):
+    return value.replace('/', '')
+
+def re_enter(value):
+    return re.sub('\\n| |查看地图', '', value)
+
+def remove_null(value):
+    end = value.rfind(' ')
+    if end == -1:
+        return value
+    return value[0:end-1]
+
+
+class LagouItemLoader(ItemLoader):
+    default_output_processor = TakeFirst()
+
+
+class LagouItem(scrapy.Item):
+    title = scrapy.Field()
+    url = scrapy.Field()
+    url_object_id = scrapy.Field()
+    job_desc = scrapy.Field(
+        input_processor=MapCompose(remove_tags,)
+    )
+    job_advantage = scrapy.Field()
+    tags = scrapy.Field(
+        input_processor=Join(',')
+    )
+    crawl_update_time = scrapy.Field()
+    crawl_time = scrapy.Field()
+    company_name = scrapy.Field()
+    company_url = scrapy.Field()
+    job_addr = scrapy.Field(
+        input_processor=MapCompose(remove_tags, re_enter)
+    )
+    pulish_time = scrapy.Field(
+        input_processor=MapCompose(remove_null)
+    )
+    job_type = scrapy.Field()
+    degree_need = scrapy.Field(
+        input_processor=MapCompose(remove_splash)
+    )
+    work_years = scrapy.Field(
+        input_processor=MapCompose(remove_splash)
+    )
+    job_city = scrapy.Field(
+        input_processor=MapCompose(remove_splash)
+    )
+    salary_min = scrapy.Field()
