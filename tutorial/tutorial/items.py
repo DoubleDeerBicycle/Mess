@@ -313,3 +313,4 @@ class LagouItem(scrapy.Item):
         )
 
         return insert_sql, params
+

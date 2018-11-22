@@ -79,6 +79,7 @@ def open_image_url(url):
         if err_num >= 3:
             print ('爬取结束')
             exit()
+            
 def get_image_url(url):
     image_html = url
     if image_html != None:

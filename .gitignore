@@ -5,4 +5,5 @@ CookiesPool-master/*
 .gitignore
 file/*
 ghostdriver.log
-python\Game\game\__pycache__/*
+python/Game/game/__pycache__/*
+*.jpg

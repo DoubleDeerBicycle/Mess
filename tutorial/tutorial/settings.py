@@ -55,8 +55,8 @@ COOKIES_ENABLED = False
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-   'scrapy.downloadermiddleware.useragent.UserAgentMiddleware': None,
-   'tutorial.middlewares.RandomUserAgentMiddlwares': 500,
+   # 'scrapy.downloadermiddleware.useragent.UserAgentMiddleware': None,
+   # 'tutorial.middlewares.RandomUserAgentMiddlwares': 500,
    # 'tutorial.middlewares.RandomProxyMiddleware': 501,
    # 'tutorial.middlewares.TutorialDownloaderMiddleware': 543,
 }

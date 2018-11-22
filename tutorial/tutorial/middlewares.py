@@ -125,7 +125,8 @@ class RandomProxyMiddleware(object):
         try:
             ip = requests.get('http://localhost:5555/get')
             if ip.status_code == 200:
-                return ip.text
+                ip_text = ip.text
+                return ip_text
         except Exception as e:
             print(e)
 
