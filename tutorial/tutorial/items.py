@@ -271,13 +271,12 @@ class LagouItem(scrapy.Item):
     url = scrapy.Field()
     url_object_id = scrapy.Field()
     job_desc = scrapy.Field(
-        input_processor=MapCompose(remove_tags,)
+        input_processor=MapCompose(remove_tags)
     )
     job_advantage = scrapy.Field()
     tags = scrapy.Field(
         input_processor=Join(',')
     )
-    crawl_update_time = scrapy.Field()
     crawl_time = scrapy.Field()
     company_name = scrapy.Field()
     company_url = scrapy.Field()
@@ -298,3 +297,19 @@ class LagouItem(scrapy.Item):
         input_processor=MapCompose(remove_splash)
     )
     salary_min = scrapy.Field()
+
+    def get_insert_sql(self):
+        insert_sql = '''
+            insert into lagou_job(title,url,url_object_id,job_desc,job_advantage,tags,
+            crawl_time,company_name,company_url,job_addr,pulish_time,
+            job_type,degree_need,work_years,job_city,salary_min) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            ON DUPLICATE KEY UPDATE salary_min=VALUES(salary_min),job_desc=VALUES(job_desc)
+        '''
+
+        params = (
+            self['title'],self['url'],self['url_object_id'],self['job_desc'],self['job_advantage'],self['tags'],
+            self['crawl_time'],self['company_name'],self['company_url'],self['job_addr'],self['pulish_time'],
+            self['job_type'],self['degree_need'],self['work_years'],self['job_city'],self['salary_min'],
+        )
+
+        return insert_sql, params

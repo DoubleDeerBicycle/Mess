@@ -6,8 +6,8 @@
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
-
-
+import random
+import requests
 class TutorialSpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
     # scrapy acts as if the spider middleware does not modify the
@@ -101,3 +101,37 @@ class TutorialDownloaderMiddleware(object):
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
+
+# 随机更换user-agent
+class RandomUserAgentMiddlwares(object):
+    def __init__(self, user_agent):
+        self.user_agent_list = user_agent
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(
+            user_agent = crawler.settings.get('USER_AGENT_LIST')
+        )
+
+    def process_request(self, request, spider):
+        user_agent = random.choice(self.user_agent_list)
+        request.headers['User-Agent'] = user_agent
+
+
+#  动态设置ip
+class RandomProxyMiddleware(object):
+    def Get_ip(self):
+        try:
+            ip = requests.get('http://localhost:5555/get')
+            if ip.status_code == 200:
+                return ip.text
+        except Exception as e:
+            print(e)
+
+
+    def process_request(self, request, spider):
+         request.meta['proxy'] = self.Get_ip()
+
+
+

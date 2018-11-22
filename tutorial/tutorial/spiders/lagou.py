@@ -5,7 +5,7 @@ from scrapy.spiders import CrawlSpider, Rule
 from tutorial.items import LagouItem,LagouItemLoader
 from tutorial.utils.common import get_md5
 from datetime import datetime
-
+from tutorial import settings
 
 class LagouSpider(CrawlSpider):
     name = 'lagou'
@@ -51,7 +51,7 @@ class LagouSpider(CrawlSpider):
         item_loader.add_css('job_addr', '.work_addr')
         item_loader.add_css('company_name', '#job_company dt a img::attr(alt)')
         item_loader.add_css('company_url', '#job_company dt a::attr(href)')
-        item_loader.add_value('crawl_time', datetime.now())
+        item_loader.add_value('crawl_time', datetime.now().strftime(settings.SQL_DATETIME_FORMAT))
         
         lagou_item = item_loader.load_item()
         return lagou_item

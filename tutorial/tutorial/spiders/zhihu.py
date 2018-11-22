@@ -30,7 +30,11 @@ class ZhihuSpider(scrapy.Spider):
     timestamp = str(int(time.time() * 1000))
     timestamp2 = str(time.time() * 1000)
     captcha_url = 'https://www.zhihu.com/api/v3/oauth/captcha?lang=en'
-
+    
+    custom_settings = {
+        'COOKIES_ENABLED': False
+    }
+    
     def parse(self, response):
         all_urls = response.css('a::attr(href)').extract()
         all_urls = [response.urljoin(url) for url in all_urls]
