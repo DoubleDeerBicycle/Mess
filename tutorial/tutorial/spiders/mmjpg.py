@@ -15,30 +15,21 @@ class MmjpgSpider(scrapy.Spider):
     def parse(self, response):
         # 获取当前页所有的图片集
         images = response.css('.pic ul li a::attr(href)').extract()
-        # 获取当前页所有图片集的名称
-        names = response.css('.pic ul li a img::attr(alt)').extract()
-        self.parse_newDir(names)
         
         for image in images:
             yield scrapy.Request(url=image, callback=self.parse_image)
+
         # 下一页
         count_page = response.css('.page .info::text').extract_first()
         re_count_page = re.search('.*?(\d+).*?', count_page).group(1)
         for page in range(2, int(re_count_page)+1):
             next = 'http://www.mmjpg.com/home/{page}'.format(page=page)  
             yield scrapy.Request(url=next, callback=self.parse)
-            
-    # 创建文件夹
-    def parse_newDir(self, names):
-        for name in names:
-            path = self.file_path+name
-            if not os.path.exists(path):
-                os.makedirs(path)
 
     # 爬取图片集链接
     def parse_image(self, response):
         name = response.css('.article h2::text').extract_first()
-        name = re.sub('\(|\d|\)', '', name)
+        name = re.sub('\(|\d|\)| ', '', name)
         image_url = response.css('#content a img::attr(src)').extract_first()
         code = ''
         for i in range(5):
@@ -55,6 +46,9 @@ class MmjpgSpider(scrapy.Spider):
             }
         content = requests.get(image_url, headers=headers).content
 
+        dir_path = self.file_path+name
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
         path = self.file_path+name+'/'+md5(content).hexdigest() +'.jpg'
         with open(path, 'wb') as f:
             f.write(content)
