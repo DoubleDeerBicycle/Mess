@@ -12,32 +12,33 @@ from urllib.parse import urljoin
 
 class Budejie():
     def __init__(self):
-        # 请求头
-        self._headers = {
-            'Cookie': '_ga=GA1.2.1463995867.1543021568; _gid=GA1.2.90421288.1543021568; Hm_lvt_7c9f93d0379a9a7eb9fb60319911385f=1543021568,1543021588,1543045666; Hm_lpvt_7c9f93d0379a9a7eb9fb60319911385f=1543045701',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3371.0 Safari/537.36'
-        }
-        # url
-        self._index = 'http://www.budejie.com/'
-        # 使用chrome爬取 禁止加载图片，提高爬取效率
+         # 使用chrome爬取 禁止加载图片，提高爬取效率
         self.__options = webdriver.ChromeOptions()
         self.__prefs = {
             'profile.default_content_setting_values' : {
                 'images' : 2
             }
         }
-        self.__options.add_experimental_option('prefs',self.__prefs)        
+        self.__options.add_experimental_option('prefs',self.__prefs)
+        # 引用chrome
+        self._chrome = webdriver.Chrome(chrome_options=self.__options)
+        # 超时等待调用
+        self._wait = WebDriverWait(self._chrome, 10)
+        # 请求头
+        self._headers = {
+            'Cookie': '_ga=GA1.2.1463995867.1543021568; _gid=GA1.2.90421288.1543021568; Hm_lvt_7c9f93d0379a9a7eb9fb60319911385f=1543021568,1543021588,1543045666; Hm_lpvt_7c9f93d0379a9a7eb9fb60319911385f=1543045701',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3371.0 Safari/537.36'
+        }
+        # url
+        self._index = 'http://www.budejie.com/'        
         # 视频url
         self._video_url = 'http://www.budejie.com/video/'
         # 视频保存路径
         self._path = os.getcwd()+'/file/视频/百思不得姐/'
+
     # 链接请求
     def rq_index(self):
         try:
-            # 引用chrome
-            self._chrome = webdriver.Chrome(chrome_options=self.__options)
-            # 超时等待调用
-            self._wait = WebDriverWait(self._chrome, 10)
             # 判断是否点击下一页
             if self._chrome.current_url != 'data:,':
                 self._index = self._chrome.current_url
@@ -88,16 +89,22 @@ class Budejie():
             path = file_dir+name
             if not os.path.exists(path):
                 os.makedirs(path)
-            # 获取图片二进制并写入
-            content = requests.get(img_url).content
-            # md5生成图片名
-            file_name = md5(content).hexdigest()
-            with open(path+'/'+file_name+'.gif', 'wb') as f:
-                print('{}开始下载..'.format(name))
-                f.write(content)
+                # 获取图片二进制并写入
+                content = requests.get(img_url).content
+                # md5生成图片名
+                file_name = md5(content).hexdigest()
+                with open(path+'/'+file_name+'.gif', 'wb') as f:
+                    print('{}开始下载..'.format(name))
+                    f.write(content)
+            else:
+                print(name+'\t已存在，跳过下载')
         except FileNotFoundError as e:
             print(e)
     
+    # 关闭chrome
+    def quit_chrome(self):
+        self._chrome.quit()
+
     # 视频地址请求
     def rq_video(self, url):
         try:
@@ -130,16 +137,22 @@ class Budejie():
                 print(e)
     # 视频数据保存
     def _down_video(self, file_name, url):
+        file_name = re.sub('[ \/:*?"<>|".]', '', file_name)
         path = self._path+file_name+'.mp4'
         content = requests.get(url).content
-        with open(path, 'wb') as f:
-            print('下载到:{}'.format(file_name))
-            f.write(content)
+        if os.path.exists(path):
+            print(file_name+'\t已存在，跳过下载')
+        else:
+            with open(path, 'wb') as f:
+                print('下载到:{}'.format(file_name))
+                f.write(content)
 
 
 bdj = Budejie()
 # 图片下载
 # bdj.rq_index()
 
+# 关闭chrome
+bdj.quit_chrome()
 # 视频下载
 bdj.rq_video('http://www.budejie.com/video/')
