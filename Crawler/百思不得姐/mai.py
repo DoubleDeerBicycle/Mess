@@ -81,7 +81,7 @@ class Budejie():
 
     # 图片数据保存
     def _down_image(self, name, img_url):
-        name = re.sub('[ \/:*?"<>|".]', '', name)
+        name = re.sub('[ \/:*?"<>|".\n]', '', name)
         # 存放路径
         file_dir = os.getcwd()+'/file/图片/百思不得姐/'
         # 文件夹分类
@@ -138,7 +138,7 @@ class Budejie():
                 
     # 视频数据保存
     def _down_video(self, file_name, url):
-        file_name = re.sub('[ \/:*?"<>|".]', '', file_name)
+        file_name = re.sub('[ \/:*?"<>|".\n]', '', file_name)
         path = self._path+file_name+'.mp4'
         content = requests.get(url).content
         if os.path.exists(path):
