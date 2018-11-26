@@ -8,6 +8,13 @@
 from scrapy import signals
 import random
 import requests
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from scrapy.http import HtmlResponse
+
 class TutorialSpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
     # scrapy acts as if the spider middleware does not modify the
@@ -135,4 +142,18 @@ class RandomProxyMiddleware(object):
          request.meta['proxy'] = self.Get_ip()
 
 
+# 通过Chrome请求动态网页，selenium集成到scrapy中
+class JSpageMiddleware(object):
+    def __init__(self):
+        self.browser = webdriver.Chrome()
+        self.wait = WebDriverWait(self.browser, 10)
+        super(JSpageMiddleware, self).__init__()
 
+    def process_request(self, request, spider):
+        if spider.name == 'zhihu':
+            try:
+                self.browser = webdriver.Chrome()
+                self.browser.get(request.url)
+                return HtmlResponse(url=self.browser.current_url, body=self.browser.page_source, encoding='utf-8', request=request)
+            except Exception as e:
+                print(e)
