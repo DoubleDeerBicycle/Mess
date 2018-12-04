@@ -314,3 +314,6 @@ class LagouItem(scrapy.Item):
 
         return insert_sql, params
 
+
+class ImagebaiduItems(scrapy.Field):
+    image_url = scrapy.Field()

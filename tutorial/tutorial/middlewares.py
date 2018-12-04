@@ -150,7 +150,7 @@ class JSpageMiddleware(object):
         super(JSpageMiddleware, self).__init__()
 
     def process_request(self, request, spider):
-        if spider.name == 'zhihu':
+        if spider.name == 'jobbole':
             try:
                 self.browser = webdriver.Chrome()
                 self.browser.get(request.url)

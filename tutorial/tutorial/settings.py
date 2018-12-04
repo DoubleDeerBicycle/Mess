@@ -55,9 +55,10 @@ COOKIES_ENABLED = False
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-   # 'scrapy.downloadermiddleware.useragent.UserAgentMiddleware': None,
+   'scrapy.downloadermiddleware.useragent.UserAgentMiddleware': None,
    # 'tutorial.middlewares.RandomUserAgentMiddlwares': 500,
    # 'tutorial.middlewares.RandomProxyMiddleware': 501,
+   # 'tutorial.middlewares.JSpageMiddleware': 500
    # 'tutorial.middlewares.TutorialDownloaderMiddleware': 543,
 }
 
@@ -71,19 +72,19 @@ DOWNLOADER_MIDDLEWARES = {
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    'tutorial.pipelines.TutorialPipeline': 300,
-   # 'scrapy.pipelines.images.ImagesPipeline':300, #配置下载图片
+   'scrapy.pipelines.images.ImagesPipeline':300, #配置下载图片
    # 'tutorial.pipelines.JobbolePipeline':200,
-   'tutorial.pipelines.MysqlTwistedPipeline':400
+   # 'tutorial.pipelines.MysqlTwistedPipeline':400
 }
 
 #图片url
-IMAGES_URLS_FIELD = "post_image_url"
+IMAGES_URLS_FIELD = "image_url"
 #配置图片下载路径
 images_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'images')
 IMAGES_STORE = images_dir
 #设置过滤器，分辨率低于100*100的将被过滤
-IMAGES_MIN_HEIGHT = 100
-IMAGES_MIN_WIDTH = 100
+# IMAGES_MIN_HEIGHT = 300
+# IMAGES_MIN_WIDTH = 300
 
 MYSQL_LOCALHOST = 'localhost'
 MYSQL_DB = 'scrapy'
