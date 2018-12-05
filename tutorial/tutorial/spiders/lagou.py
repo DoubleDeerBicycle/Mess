@@ -29,9 +29,9 @@ class LagouSpider(CrawlSpider):
     }
 
     rules = (
-        Rule(LinkExtractor(allow=('zhaopin/.*',)), follow=True),
-        Rule(LinkExtractor(allow=('gongsi/j\d+.html',)), follow=True),
-        Rule(LinkExtractor(allow=r'jobs/\d+.html'), callback='parse_item', follow=True),
+        Rule(LinkExtractor(allow=('zhaopin/.*')), follow=True),
+        Rule(LinkExtractor(allow=('gongsi/j\d+.html')), follow=True),
+        Rule(LinkExtractor(allow=(r'jobs/\d+.html')), callback='parse_item', follow=True),
     )
 
     def parse_item(self, response):
