@@ -83,8 +83,8 @@ IMAGES_URLS_FIELD = "image_url"
 images_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'images')
 IMAGES_STORE = images_dir
 #设置过滤器，分辨率低于100*100的将被过滤
-IMAGES_MIN_HEIGHT = 400
-IMAGES_MIN_WIDTH = 400
+IMAGES_MIN_HEIGHT = 300
+IMAGES_MIN_WIDTH = 533
 
 MYSQL_LOCALHOST = 'localhost'
 MYSQL_DB = 'scrapy'
