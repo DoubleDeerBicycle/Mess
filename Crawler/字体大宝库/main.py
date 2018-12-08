@@ -19,26 +19,31 @@ class Font():
             else:
                 return None
         except Exception as e:
-            return None
             print(e)
 
     def _get_data(self):
         doc = self._rq_index()
-        names = doc.css('.fontpic a::attr(title)').extract()
-        urls = doc.css('.fontpic a::attr(href)').extract()
-        images = doc.css('.fontpic a img::attr(src)').extract()
-        for name,url,image in zip(names,urls,images):
-            yield{
-                'name': name,
-                'url': urljoin(self._url, url),
-                'image': image
-            }
+        if doc:
+            names = doc.css('.fontpic a::attr(title)').extract()
+            urls = doc.css('.fontpic a::attr(href)').extract()
+            images = doc.css('.fontpic a img::attr(src)').extract()
+            for name,url,image in zip(names,urls,images):
+                yield{
+                    'name': name,
+                    'url': urljoin(self._url, url),
+                    'image': image
+                }
+        else:
+            return None
 
     def down_data(self):
-        for datas in self._get_data():
-            print(datas.get('name'))
-            print(datas.get('url'))
-            print(datas.get('image'))
+        try:
+            for datas in self._get_data():
+                print(datas.get('name'))
+                print(datas.get('url'))
+                print(datas.get('image'))
+        except Exception as e:
+            print(e)
         
 font = Font()
 font.down_data()
