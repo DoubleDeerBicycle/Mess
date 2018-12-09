@@ -1,5 +1,5 @@
 import sys,os
 from scrapy.cmdline import execute
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-execute(['scrapy', 'crawl', 'tianya'])
+execute(['scrapy', 'crawl', 'imagebaidu'])
 # print(os.path.dirname(os.path.abspath(__file__)))
