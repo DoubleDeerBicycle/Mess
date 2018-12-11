@@ -138,12 +138,12 @@ class Budejie():
                 
     # 视频数据保存
     def _down_video(self, file_name, url):
-        file_name = re.sub('[ \/:*?"<>|".\n]', '', file_name)
+        file_name = re.sub('[ \/:*?"<>|\r".\n]', '', file_name)
         path = self._path+file_name+'.mp4'
-        content = requests.get(url).content
         if os.path.exists(path):
             print(file_name+'\t已存在，跳过下载')
         else:
+            content = requests.get(url).content
             with open(path, 'wb') as f:
                 print('下载到:{}'.format(file_name))
                 f.write(content)

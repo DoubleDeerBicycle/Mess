@@ -72,7 +72,7 @@ DOWNLOADER_MIDDLEWARES = {
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    'tutorial.pipelines.TutorialPipeline': 300,
-   'scrapy.pipelines.images.ImagesPipeline':300, #配置下载图片
+   # 'scrapy.pipelines.images.ImagesPipeline':300, #配置下载图片
    # 'tutorial.pipelines.JobbolePipeline':200,
    # 'tutorial.pipelines.MysqlTwistedPipeline':400
 }
@@ -83,13 +83,9 @@ IMAGES_URLS_FIELD = "image_url"
 images_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'images')
 IMAGES_STORE = images_dir
 #设置过滤器，分辨率低于100*100的将被过滤
-<<<<<<< HEAD
 # IMAGES_MIN_HEIGHT = 400
 # IMAGES_MIN_WIDTH = 400
-=======
-IMAGES_MIN_HEIGHT = 300
-IMAGES_MIN_WIDTH = 533
->>>>>>> 26c4480cf81925feeca4a9c6887ee823e5289a8d
+
 
 MYSQL_LOCALHOST = 'localhost'
 MYSQL_DB = 'scrapy'
