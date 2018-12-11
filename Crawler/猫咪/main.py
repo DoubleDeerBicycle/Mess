@@ -3,6 +3,7 @@ import re,os
 from scrapy.selector import Selector
 from urllib.parse import urljoin
 import random
+from hashlib import md5
 
 
 class Maomi():
@@ -28,7 +29,7 @@ class Maomi():
                 if next_url:
                     self.rq_index(urljoin(self.index, next_url))
             else:
-                print(response.status_code)
+                print('HTTP error{}'.format(response.status_code))
         except Exception as e:
             print(url)
             print(e)
@@ -49,33 +50,37 @@ class Maomi():
                         'title': title
                     }
                 else:
-                    print(response.status_code)
+                    print('HTTP error{}'.format(response.status_code))
             except Exception as e:
                 print(url)
                 print(e)
 
     def down_video(self, url, title):
-        file_name = re.sub('[ \/:*?"<>|\r".\n]', '', title)
-        url = re.sub('one\.', '', url)
-        dir_path = os.getcwd()+'/file/视频/猫咪/'
-        if not os.path.exists(dir_path):
-            os.makedirs(dir_path)
-        path = dir_path+file_name+'.mp4'
-        if os.path.exists(path):
-            print(file_name+'已存在，跳过下载')
-        else:
-            try:
-                response = requests.get(url, headers=self.headers)
-                if response.status_code == 200:
-                    content = response.content
-                    with open(path, 'wb') as f:
-                        print('正在下载:'+file_name)
-                        f.write(content)
-                        f.close()
-                else:
-                    print(response.status_code)
-            except Exception as e:
-                print(url)
-                print(e)
+        if url != None and title != None:
+            file_name = re.sub('[ \/:*?"<>|\r".\n]', '', title)
+            url = re.sub('one\.', '', url)
+            dir_path = os.getcwd()+'/file/视频/猫咪/'
+            if not os.path.exists(dir_path):
+                os.makedirs(dir_path)
+            if file_name == '':
+                file_name = chr(random.randint(1000, 2000))
+            path = dir_path+file_name+'.mp4'
+            if os.path.exists(path):
+                print(file_name+'已存在，跳过下载')
+            else:
+                try:
+                    response = requests.get(url, headers=self.headers)
+                    if response.status_code == 200:
+                        content = response.content
+                        with open(path, 'wb') as f:
+                            print('正在下载:'+file_name)
+                            f.write(content)
+                            f.close()
+                    else:
+                        print('HTTP error{}'.format(response.status_code))
+                except Exception as e:
+                    print(url)
+                    print(e)
 mao = Maomi()
 mao.rq_index(mao.index)
+# mao.rq_index('https://www.970ii.com/shipin/list-%E7%9F%AD%E8%A7%86%E9%A2%91-43.html')
