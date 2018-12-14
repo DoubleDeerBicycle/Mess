@@ -72,7 +72,7 @@ DOWNLOADER_MIDDLEWARES = {
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    'tutorial.pipelines.TutorialPipeline': 300,
-   # 'scrapy.pipelines.images.ImagesPipeline':300, #配置下载图片
+   'scrapy.pipelines.images.ImagesPipeline':300, #配置下载图片
    # 'tutorial.pipelines.JobbolePipeline':200,
    # 'tutorial.pipelines.MysqlTwistedPipeline':400
 }
