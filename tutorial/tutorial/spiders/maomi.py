@@ -7,7 +7,7 @@ class MaomiSpider(scrapy.Spider):
     name = 'maomi'
     allowed_domains = ['www.662ii.com', '991video.com']
     start_urls = ['https://www.662ii.com/shipin/list-%E7%9F%AD%E8%A7%86%E9%A2%91.html']
-
+    
     def parse(self, response):
         urls = response.css('.grid.effect-1 li a::attr(href)').extract()
         names = response.css('.grid.effect-1 li a::attr(title)').extract()
@@ -21,12 +21,12 @@ class MaomiSpider(scrapy.Spider):
     def parse_video(self, response):
         video_url = re.sub('one\.', '' ,response.css('#lin1k0::attr(data-clipboard-text)').extract_first())
         name = re.sub('[ \/:*?"<>|\r".\n]', '', response.meta.get('name'))
-        yield scrapy.Request(url=video_url, meta={'name': name}, callback=self.parse_down)
+        path = os.path.dirname(os.getcwd())+'/file/视频/猫咪/'+name+'.mp4'
+        if not os.path.exists(path):
+            yield scrapy.Request(url=video_url, meta={'path': path, 'name': name}, callback=self.parse_down)
 
     def parse_down(self, response):
-        path = os.path.dirname(os.getcwd())+'/file/视频/猫咪/'+response.meta.get('name')+'.mp4'
-        if not os.path.exists(path):
-            with open(path, 'wb') as f:
-                print('download:'+response.meta.get('name'))
-                f.write(response.body)
-                f.close()
+        with open(response.meta.get('path'), 'wb') as f:
+            print('download:'+response.meta.get('name'))
+            f.write(response.body)
+            f.close()
