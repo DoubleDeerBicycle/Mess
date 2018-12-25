@@ -1,14 +1,16 @@
-import requests
-import re,os
-from scrapy.selector import Selector
-from urllib.parse import urljoin
+import os
 import random
+import re
 from hashlib import md5
+from urllib.parse import urljoin
+
+import requests
+from scrapy.selector import Selector
 
 
 class Maomi():
     def __init__(self):
-        self.index = 'https://www.233ii.com/shipin/list-%E7%9F%AD%E8%A7%86%E9%A2%91.html'
+        self.index = 'https://www.662ii.com/shipin/list-%E7%9F%AD%E8%A7%86%E9%A2%91.html'
         self.headers = {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3371.0 Safari/537.36',
             'cookie': '__cfduid=d812bdcf4314c876b7aa015bf1ec0d3431541315130',
@@ -83,4 +85,4 @@ class Maomi():
                     print(e)
 mao = Maomi()
 mao.rq_index(mao.index)
-# mao.rq_index('https://www.233ii.com/shipin/list-%E7%9F%AD%E8%A7%86%E9%A2%91-43.html')
+# mao.rq_index('https://www.662ii.com/shipin/list-%E7%9F%AD%E8%A7%86%E9%A2%91-43.html')

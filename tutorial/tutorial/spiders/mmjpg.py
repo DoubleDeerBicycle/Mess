@@ -24,7 +24,7 @@ class MmjpgSpider(scrapy.Spider):
         re_count_page = re.search('.*?(\d+).*?', count_page).group(1)
         for page in range(2, int(re_count_page)+1):
             next = 'http://www.mmjpg.com/home/{page}'.format(page=page)  
-            yield scrapy.Request(url=next, callback=self.parse)
+            yield scrapy.Request(url=next, callback=self.parse, priority=5)
 
     # 爬取图片集链接
     def parse_image(self, response):
@@ -55,4 +55,4 @@ class MmjpgSpider(scrapy.Spider):
 
         next = response.css('.page .next::attr(href)').extract_first()
         page = response.urljoin(next)
-        yield scrapy.Request(url=page, callback=self.parse_image)
+        yield scrapy.Request(url=page, callback=self.parse_image, priority=10)
