@@ -16,7 +16,7 @@ class ImagebaiduSpider(scrapy.Spider):
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3371.0 Safari/537.36'
     }
     # 图片关键词
-    image = '门匾素材'
+    image = '水墨毛笔'
     url = 'https://image.baidu.com/search/acjson?'
     # 页数（每页默认30张图片）
     page = 5 

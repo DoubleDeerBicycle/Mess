@@ -76,13 +76,13 @@ def download_text(yl_url):
         f.write(yl_url.get('name')+'\n'+yl_url.get('text')+'\n')
 def main():
     url = input('请输入笔趣阁小说链接\n')
-    if 'http://www.biquge.com.tw' in url:
-        for chapter_url in bs_get_url(get_txt_url(url)):
-            for text in split_chapter(chapter_url):
-                download_text(text)
-        print ('下载完成')
-    else:
-        print ('请输入笔趣阁链接')
-        exit()
+    # if 'http://www.biquge.com.tw' in url:
+    for chapter_url in bs_get_url(get_txt_url(url)):
+        for text in split_chapter(chapter_url):
+            download_text(text)
+    print ('下载完成')
+    # else:
+    #     print ('请输入笔趣阁链接')
+    #     exit()
 if __name__ == '__main__':
     main()

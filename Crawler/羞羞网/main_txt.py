@@ -54,9 +54,8 @@ def page_class():
         print ('序号中包含未知数字')
         return
     for i in range(1,page+1):
-        # yield 'https://www.908ii.com/xiaoshuo/list-'+text_class+'-'+str(i)+'.html'
         yield {
-            'url':'https://www.908ii.com/xiaoshuo/list-'+text_class+'-'+str(i)+'.html',
+            'url':'https://www.662ii.com/xiaoshuo/list-'+text_class+'-'+str(i)+'.html',
             'cla':text_class
         }
 
@@ -67,7 +66,7 @@ def get_text_url(html):
         
         text_css = str(css_class)
 
-        top = 'https://www.908ii.com'
+        top = 'https://www.662ii.com'
 
         text_html = re.findall('href="(.*?)"',text_css,re.S)
         
