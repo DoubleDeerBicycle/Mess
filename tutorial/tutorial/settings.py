@@ -31,6 +31,8 @@ ROBOTSTXT_OBEY = False
 # See also autothrottle settings and docs
 #  爬取速度延迟
 DOWNLOAD_DELAY = 0.5
+#Request超时等待时间
+DOWNLOADTIMEOUT = 600
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16

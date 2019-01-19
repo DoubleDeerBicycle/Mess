@@ -5,8 +5,8 @@ import os
 
 class MaomiSpider(scrapy.Spider):
     name = 'maomi'
-    allowed_domains = ['www.662ii.com', '991video.com']
-    start_urls = ['https://www.662ii.com/shipin/list-%E7%9F%AD%E8%A7%86%E9%A2%91.html']
+    allowed_domains = ['www.136ii.com', '991video.com']
+    start_urls = ['https://www.136ii.com/shipin/list-%E7%9F%AD%E8%A7%86%E9%A2%91.html']
     
     def parse(self, response):
         urls = response.css('.grid.effect-1 li a::attr(href)').extract()
