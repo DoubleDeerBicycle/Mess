@@ -21,7 +21,7 @@ class MaomiSpider(scrapy.Spider):
     def parse_video(self, response):
         video_url = re.sub('one\.', '' ,response.css('#lin1k0::attr(data-clipboard-text)').extract_first())
         name = re.sub('[ \/:*?"<>|\r".\n]', '', response.meta.get('name'))
-        path = os.path.dirname(os.getcwd())+'/file/视频/猫咪/'+name+'.mp4'
+        path = os.path.dirname(os.path.dirname(os.getcwd()))+'/file/视频/猫咪/'+name+'.mp4'
         if not os.path.exists(path):
             yield scrapy.Request(url=video_url, meta={'path': path, 'name': name}, callback=self.parse_down)
 
