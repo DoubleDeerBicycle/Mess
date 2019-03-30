@@ -117,6 +117,7 @@ class Amlyu:
             for url in self.__image:
                 content = requests.get(url).content
                 with open(file_dir+'/'+md5(content).hexdigest()+'.jpg','wb') as f:
+                    print('aaa')
                     f.write(content)
 #启动程序
 amlyu = Amlyu()
